@@ -1,25 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useMemo, useState } from 'react';
+import * as Pages from './pages';
+
+const tabs = [
+  {
+    id: 1,
+    label: 'React Form Builder',
+    componentName: 'ReactFormBuilder2',
+  },
+];
 
 function App() {
+  const [currentTab, setCurrentTab] = useState(null);
+
+  const handleSetCurrentTab = (item: any) => {
+    setCurrentTab(item);
+  };
+
+  const TabsMapper = useMemo(
+    () =>
+      tabs.map((tab) => (
+        <button onClick={() => handleSetCurrentTab(tab)}>{tab.label}</button>
+      )),
+    [tabs]
+  );
+
+  const renderPage = useMemo(() => {
+    if (!currentTab) return <></>;
+    const { componentName } = currentTab ?? {};
+
+    const Page = Pages[componentName];
+
+    if (!Page) return <></>;
+
+    //@ts-ignore
+    return <Page />;
+  }, [currentTab]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {TabsMapper}
+      {renderPage}
+    </>
   );
 }
 
