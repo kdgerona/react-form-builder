@@ -1,47 +1,47 @@
-import React, { useMemo, useState } from 'react';
-import * as Pages from './pages';
+import React from 'react';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from 'react-router-dom';
+import 'react-form-builder2/dist/app.css';
 
-const tabs = [
-  {
-    id: 1,
-    label: 'React Form Builder',
-    componentName: 'ReactFormBuilder2',
-  },
-];
+// Pages
+import Root from './pages/Root';
+import FormBuilder from './pages/FormBuilder';
+import FormPreview from './pages/FormPreview';
+import ErorPage from './pages/ErrorPage';
 
-function App() {
-  const [currentTab, setCurrentTab] = useState(null);
+// TODO: Routing
+const App: React.FC = () => {
+  const router = createBrowserRouter([
+    {
+      path: 'form',
+      element: <Root />,
+      errorElement: <ErorPage />,
+      children: [
+        {
+          path: 'builder',
+          element: <FormBuilder />,
+        },
+        {
+          path: 'preview',
+          element: <FormPreview />,
+        },
+        {
+          path: '*',
+          index: true,
+          element: <Navigate to='/form/builder' />,
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to='/form/builder' />,
+    },
+  ]);
 
-  const handleSetCurrentTab = (item: any) => {
-    setCurrentTab(item);
-  };
-
-  const TabsMapper = useMemo(
-    () =>
-      tabs.map((tab) => (
-        <button onClick={() => handleSetCurrentTab(tab)}>{tab.label}</button>
-      )),
-    [tabs]
-  );
-
-  const renderPage = useMemo(() => {
-    if (!currentTab) return <></>;
-    const { componentName } = currentTab ?? {};
-
-    const Page = Pages[componentName];
-
-    if (!Page) return <></>;
-
-    //@ts-ignore
-    return <Page />;
-  }, [currentTab]);
-
-  return (
-    <>
-      {TabsMapper}
-      {renderPage}
-    </>
-  );
-}
+  return <RouterProvider router={router} />;
+};
 
 export default App;
